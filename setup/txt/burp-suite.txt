@@ -1,0 +1,8 @@
+Open the "C:\Windows\System32\drivers\etc\hosts" file in Windows
+Add "127.0.0.1    dvwa.local" 
+
+Start Burp Suite in Windows
+
+Configure your Firefox proxy settings to 127.0.0.1:8080
+
+Load the page in Firefox using the FQDN (this is necessary for Burp Suite capture)
