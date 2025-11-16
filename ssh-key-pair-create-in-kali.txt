@@ -1,0 +1,108 @@
+Kali:
+
+┌──(kali㉿kali)-[~]
+└─$ mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+
+┌──(kali㉿kali)-[~]
+└─$ sudo vim /etc/ssh/sshd_config
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+PubkeyAuthentication yes
+
+┌──(kali㉿kali)-[~]
+└─$ sudo systemctl status ssh                       
+[sudo] password for kali: 
+○ ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; disabled; preset: >
+     Active: inactive (dead)
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+                                                                        
+┌──(kali㉿kali)-[~]
+└─$ sudo systemctl start ssh 
+                                                                             
+┌──(kali㉿kali)-[~]
+└─$ sudo systemctl enable ssh
+Synchronizing state of ssh.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable ssh
+Created symlink '/etc/systemd/system/sshd.service' → '/usr/lib/systemd/system/ssh.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/ssh.service' → '/usr/lib/systemd/system/ssh.service'.
+
+┌──(kali㉿kali)-[~]
+└─$ ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa-kali
+Generating public/private rsa key pair.
+Enter passphrase for "/home/kali/.ssh/id_rsa-kali" (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/kali/.ssh/id_rsa-kali
+Your public key has been saved in /home/kali/.ssh/id_rsa-kali.pub
+The key fingerprint is:
+SHA256:<redacted> kali@kali
+The key's randomart image is:
+<Redacted>>
+
+┌──(kali㉿kali)-[~]
+└─$ cat ~/.ssh/id_rsa-kali.pub >> ~/.ssh/authorized_keys
+
+┌──(kali㉿kali)-[~]
+└─$ base64 ~/.ssh/id_rsa-kali > id_rsa-kali.b64
+
+┌──(kali㉿kali)-[~]
+└─$ cat id_rsa-kali.b64
+R3D4CT3D5TR1NG
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Windows:
+
+PS C:\Users\user> New-Item -ItemType Directory -Force -Path "$HOME\.ssh"
+    Directory: C:\Users\user
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          5/6/2025   4:28 PM                .ssh
+
+
+PS C:\Users\user> $encoded = @"
+>> R3D4CT3D5TR1NG
+>> "@
+
+
+PS C:\Users\user> [IO.File]::WriteAllBytes("$HOME\.ssh\id_rsa-kali", [Convert]::FromBase64String($encoded))
+
+
+PS C:\Users\user> ssh -i $HOME\.ssh\id_rsa-kali kali@192.168.48.128
+Enter passphrase for key 'C:\Users\user\.ssh\id_rsa-kali':
+Last login: Sat May 24 17:17:52 2025 from 192.168.48.1
+
+┌──(kali㉿kali)-[~]
+└─$
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Misc: If the key was transferred from a different machine:
+
+PS C:\Users\user> takeown /f "$HOME\id_rsa-kali"
+SUCCESS: The file (or folder): "C:\Users\user\id_rsa-kali" now owned by user "host\user".
+
+
+PS C:\Users\user> icacls "$HOME\id_rsa-kali" /grant:r "$($env:USERNAME):F"
+processed file: C:\Users\user\id_rsa-kali
+Successfully processed 1 files; Failed processing 0 files
+
+
+PS C:\Users\user> mkdir "$HOME\.ssh" -Force
+    Directory: C:\Users\user
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          5/6/2025   3:50 PM                .ssh
+
+
+PS C:\Users\user> Move-Item "$HOME\id_rsa-kali" "$HOME\.ssh\id_rsa-kali"
+
+
+PS C:\Users\user> icacls "$HOME\.ssh\id_rsa-kali" /inheritance:r
+processed file: C:\Users\user\.ssh\id_rsa-kali
+Successfully processed 1 files; Failed processing 0 files
+
+
+PS C:\Users\user> icacls "$HOME\.ssh\id_rsa-kali" /grant:r "$($env:USERNAME):R"
+processed file: C:\Users\user\.ssh\id_rsa-kali
+Successfully processed 1 files; Failed processing 0 files
