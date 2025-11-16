@@ -1,0 +1,104 @@
+------------------------------------------------------------------------------------------------------------------------------
+Step 1: Enable SSH and Allow SSH Through the Firewall:
+
+master@master-VMware-Virtual-Platform:~$ sudo apt install openssh-server
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  ncurses-term openssh-sftp-server ssh-import-id
+Suggested packages:
+  molly-guard monkeysphere ssh-askpass
+The following NEW packages will be installed:
+  ncurses-term openssh-server openssh-sftp-server ssh-import-id
+0 upgraded, 4 newly installed, 0 to remove and 1 not upgraded.
+Need to get 832 kB of archives.
+After this operation, 6,743 kB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+
+master@master-VMware-Virtual-Platform:~$ sudo systemctl enable ssh
+Synchronizing state of ssh.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable ssh
+Created symlink /etc/systemd/system/sshd.service → /usr/lib/systemd/system/ssh.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/ssh.service → /usr/lib/systemd/system/ssh.service.
+
+master@master-VMware-Virtual-Platform:~$ sudo systemctl start ssh
+
+master@master-VMware-Virtual-Platform:~$ sudo systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2025-05-17 20:30:23 MST; 3s ago
+TriggeredBy: ● ssh.socket
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+    Process: 5169 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+   Main PID: 5171 (sshd)
+      Tasks: 1 (limit: 4551)
+     Memory: 1.2M (peak: 1.6M)
+        CPU: 11ms
+     CGroup: /system.slice/ssh.service
+             └─5171 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+May 17 20:30:23 master-VMware-Virtual-Platform systemd[1]: Starting ssh.service - OpenBSD Secure Shell server...
+May 17 20:30:23 master-VMware-Virtual-Platform sshd[5171]: Server listening on :: port 22.
+May 17 20:30:23 master-VMware-Virtual-Platform systemd[1]: Started ssh.service - OpenBSD Secure Shell server.
+
+master@master-VMware-Virtual-Platform:~$ sudo ufw allow 22/tcp
+Rules updated
+Rules updated (v6)
+
+master@master-VMware-Virtual-Platform:~$ sudo ufw enable
+Firewall is active and enabled on system startup
+
+------------------------------------------------------------------------------------------------------------------------------
+Step 2: Create the .ssh directory (in Windows) and generate the SSH Key Pair:
+mkdir .ssh
+ssh-keygen -t rsa -b 4096 -f "$env:USERPROFILE\.ssh\id_rsa-ubuntu"
+
+------------------------------------------------------------------------------------------------------------------------------
+Step 3: Verify the Files:
+PS C:\Users\user> Test-Path "$env:USERPROFILE\.ssh\id_rsa-ubuntu"
+True
+
+PS C:\Users\user> Test-Path "$env:USERPROFILE\.ssh\id_rsa-ubuntu.pub" 
+True
+
+------------------------------------------------------------------------------------------------------------------------------
+Step 4: Copy Public Key and paste it into the .ssh directory in Ubuntu Server: 
+PS C:\Users\user> Get-Content "$env:USERPROFILE\.ssh\id_rsa-ubuntu.pub"
+master@master-VMware-Virtual-Platform:~$ mkdir -p ~/.ssh
+master@master-VMware-Virtual-Platform:~$ chmod 700 ~/.ssh
+master@master-VMware-Virtual-Platform:~$ nano .ssh/authorized_keys 
+
+------------------------------------------------------------------------------------------------------------------------------
+Step 5: Update the SSH Config File:
+master@master-VMware-Virtual-Platform:~$ sudo apt install vim
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  vim-runtime
+Suggested packages:
+  ctags vim-doc vim-scripts
+The following NEW packages will be installed:
+  vim vim-runtime
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Need to get 9,161 kB of archives.
+After this operation, 41.6 MB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+
+master@master-VMware-Virtual-Platform:~$ sudo vim /etc/ssh/sshd_config
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+PubkeyAuthentication yes
+ 
+------------------------------------------------------------------------------------------------------------------------------
+Step 6: Restart SSH to Apply Changes
+master@master-VMware-Virtual-Platform:~$ sudo systemctl restart ssh
+
+------------------------------------------------------------------------------------------------------------------------------
+Step 7: Use the SSH Private Key to Connect to Ubuntu:
+PS C:\Users\user> ssh -i $HOME\.ssh\id_rsa-ubuntu master@192.168.48.129
+Enter passphrase for key 'C:\Users\user\.ssh\id_rsa-ubuntu':
+
+master@master-VMware-Virtual-Platform:~$
