@@ -1,0 +1,88 @@
+Allowing other hosts on the network to access the DVWA:
+
+Replace 127.0.0.1 with 0.0.0.0:
+┌──(kali㉿host)-[/var/www/html/DVWA/hackable/uploads]
+└─$ sudo sed -i 's/^Listen 127\.0\.0\.1:80/Listen 0.0.0.0:80/' /etc/apache2/ports.conf && sudo systemctl restart apache2
+
+┌──(kali㉿host)-[/var/www/html/DVWA/hackable/uploads]
+└─$ head /etc/apache2/ports.conf
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+Listen 0.0.0.0:80
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+Allow Port 80 on the internal network:
+PS C:\Users\user> New-NetFirewallRule -DisplayName "Allow HTTP on port 80" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+Name                          : {425aea7d-90bd-42d2-bdcb-e17561799535}
+DisplayName                   : Allow HTTP on port 80
+Description                   :
+DisplayGroup                  :
+Group                         :
+Enabled                       : True
+Profile                       : Any
+Platform                      : {}
+Direction                     : Inbound
+Action                        : Allow
+EdgeTraversalPolicy           : Block
+LooseSourceMapping            : False
+LocalOnlyMapping              : False
+Owner                         :
+PrimaryStatus                 : OK
+Status                        : The rule was parsed successfully from the store. (65536)
+EnforcementStatus             : NotApplicable
+PolicyStoreSource             : PersistentStore
+PolicyStoreSourceType         : Local
+RemoteDynamicKeywordAddresses : {}
+PolicyAppId                   :
+PackageFamilyName             :
+
+Forward the traffic from port 80, to port 80 on the WSL interface (or you can also set 127.0.0.1 as the "connectaddress"):
+PS C:\Users\user> netsh interface portproxy add v4tov4 listenport=80 listenaddress=0.0.0.0 connectport=80 connectaddress=172.24.180.189
+
+Access the web application from another host on the network:
+PS C:\Users\user>  wget http://192.168.0.2/DVWA/
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : 
+
+RawContent        : HTTP/1.1 200 OK
+                    Keep-Alive: timeout=5, max=100
+                    Connection: Keep-Alive
+                    Content-Length: 9
+                    Content-Type: text/html; charset=UTF-8
+                    Date: Sun, 04 May 2025 23:10:35 GMT
+                    Server: Apache/2.4.63 (Debian)...
+Forms             : {}
+Headers           : {[Keep-Alive, timeout=5, max=100], [Connection, Keep-Alive], [Content-Length, 9], [Content-Type, text/html; charset=UTF-8]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 9
+
+------------------------------------------------------------------------------------------------------------------------------------
+Cleanup:
+
+Stop listening on port 80:
+PS C:\Users\user> netsh advfirewall firewall show rule name=all | findstr 80
+Rule Name:                            Allow HTTP on port 80
+LocalPort:                            80
+
+PS C:\Users\user> netsh advfirewall firewall delete rule name="Allow HTTP on port 80"
+Deleted 1 rule(s).
+Ok.
+
+Delete the port forward:
+PS C:\Users\user> netsh interface portproxy show all
+Listen on ipv4:             Connect to ipv4:
+Address         Port        Address         Port
+--------------- ----------  --------------- ----------
+0.0.0.0         80          172.24.180.189  80
+
+PS C:\Users\user> netsh interface portproxy del v4tov4 listenport=80 listenaddress=0.0.0.0
