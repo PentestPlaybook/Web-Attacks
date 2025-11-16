@@ -1,0 +1,189 @@
+┌──(kali㉿host)-[/mnt/c/Users/user]
+└─$ sudo apt update && sudo apt -y upgrade
+[sudo] password for kali:
+Get:1 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot InRelease [41.5 kB]
+Get:2 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/main amd64 Packages [20.5 MB]
+Get:3 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/main amd64 Contents (deb) [49.0 MB]
+Get:4 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/contrib amd64 Packages [115 kB]
+Get:5 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/contrib amd64 Contents (deb) [266 kB]
+Get:6 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/non-free amd64 Packages [196 kB]
+Get:7 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/non-free amd64 Contents (deb) [878 kB]
+Get:8 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/non-free-firmware amd64 Packages [10.6 kB]
+Get:9 http://mirrors.ocf.berkeley.edu/kali kali-last-snapshot/non-free-firmware amd64 Contents (deb) [24.2 kB]
+Fetched 71.1 MB in 21s (3,350 kB/s)
+All packages are up to date.
+Summary:
+  Upgrading: 0, Installing: 0, Removing: 0, Not Upgrading: 0
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/mnt/c/Users/user]
+└─$ sudo apt install apache2 mariadb-server php php-mysqli php-gd php-xml -y
+Note, selecting 'php8.4-mysql' instead of 'php-mysqli'
+Installing:
+  apache2  mariadb-server  php  php-gd  php-xml  php8.4-mysql
+
+Installing dependencies:
+  apache2-bin            libapr1t64               libcurl4t64            libfreetype6       libharfbuzz0b            libimagequant0              libmpfr6              libtiff6             mariadb-common                  php8.4-common     xdg-user-dirs
+  apache2-data           libaprutil1-dbd-sqlite3  libdav1d7              libfribidi0        libheif-plugin-aomenc    libio-compress-brotli-perl  libncurses6           libtimedate-perl     mariadb-plugin-provider-bzip2   php8.4-gd
+  apache2-utils          libaprutil1-ldap         libdbd-mariadb-perl    libgav1-1          libheif-plugin-dav1d     libio-html-perl             libnuma1              liburi-perl          mariadb-plugin-provider-lz4     php8.4-opcache
+  fontconfig-config      libaprutil1t64           libdbi-perl            libgcrypt20        libheif-plugin-libde265  libjbig0                    libpng16-16t64        libwebp7             mariadb-plugin-provider-lzma    php8.4-readline
+  fonts-dejavu-core      libargon2-1              libde265-0             libgd3             libheif-plugin-x265      libjpeg62-turbo             libraqm0              libx265-215          mariadb-plugin-provider-lzo     php8.4-xml
+  fonts-dejavu-mono      libatomic1               libdeflate0            libglib2.0-0t64    libheif1                 liblerc4                    librav1e0.7           libxpm4              mariadb-plugin-provider-snappy  psmisc
+  galera-4               libavif16                libencode-locale-perl  libglib2.0-data    libhtml-parser-perl      liblsof0                    libsharpyuv0          libxslt1.1           mariadb-server-core             pv
+  gawk                   libcgi-fast-perl         libfcgi-bin            libgomp1           libhtml-tagset-perl      liblua5.4-0                 libsigsegv2           libyuv0              mysql-common                    rsync
+  libabsl20230802        libcgi-pm-perl           libfcgi-perl           libgpg-error-l10n  libhtml-template-perl    liblwp-mediatypes-perl      libsnappy1v5          lsof                 php-common                      shared-mime-info
+  libaom3                libclone-perl            libfcgi0t64            libgpg-error0      libhttp-date-perl        liblzo2-2                   libsvtav1enc2         mariadb-client       php8.4                          socat
+  libapache2-mod-php8.4  libconfig-inifiles-perl  libfontconfig1         libgraphite2-3     libhttp-message-perl     libmariadb3                 libterm-readkey-perl  mariadb-client-core  php8.4-cli                      ssl-cert
+
+Suggested packages:
+  apache2-doc              www-browser  php-pear            libsql-statement-perl  low-memory-monitor        libheif-plugin-jpegenc  libheif-plugin-kvazaar  libdata-dump-perl        libmime-base32-perl  mailx           doc-base
+  apache2-suexec-pristine  ufw          libmldbm-perl       rng-tools              libheif-plugin-ffmpegdec  libheif-plugin-j2kdec   libheif-plugin-rav1e    libipc-sharedcache-perl  libregexp-ipv6-perl  mariadb-test    python3-braceexpand
+  | apache2-suexec-custom  gawk-doc     libnet-daemon-perl  libgd-tools            libheif-plugin-jpegdec    libheif-plugin-j2kenc   libheif-plugin-svtenc   libbusiness-isbn-perl    libwww-perl          netcat-openbsd
+
+Summary:
+  Upgrading: 0, Installing: 117, Removing: 0, Not Upgrading: 0
+  Download size: 49.3 MB
+  Space needed: 321 MB / 1,025 GB available
+
+Get:8 http://kali.darklab.sh/kali kali-last-snapshot/main amd64 apache2-data all 2.4.63-1 [160 kB]
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+┌──(kali㉿host)-[/mnt/c/Users/user]
+└─$ sudo systemctl enable --now apache2 mariadb
+Synchronizing state of apache2.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable apache2
+Synchronizing state of mariadb.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable mariadb
+Created symlink '/etc/systemd/system/multi-user.target.wants/apache2.service' → '/usr/lib/systemd/system/apache2.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/mariadb.service' → '/usr/lib/systemd/system/mariadb.service'.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/mnt/c/Users/user]
+└─$ cd /var/www/html
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ sudo git clone https://github.com/digininja/DVWA.git
+Cloning into 'DVWA'...
+remote: Enumerating objects: 5299, done.
+remote: Counting objects: 100% (140/140), done.
+remote: Compressing objects: 100% (42/42), done.
+remote: Total 5299 (delta 115), reused 98 (delta 98), pack-reused 5159 (from 3)
+Receiving objects: 100% (5299/5299), 2.68 MiB | 5.57 MiB/s, done.
+Resolving deltas: 100% (2588/2588), done.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ sudo chown -R www-data:www-data DVWA
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ sudo mysql -e "CREATE DATABASE dvwa;"
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ sudo mysql -e "CREATE USER 'dvwa'@'localhost' IDENTIFIED BY 'dvwapass';"
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ sudo mysql -e "GRANT ALL ON dvwa.* TO 'dvwa'@'localhost';"
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html]
+└─$ cd DVWA/config
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo cp config.inc.php.dist config.inc.php
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo vim config.inc.php
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo sed -n '18,22p' config.inc.php
+$_DVWA[ 'db_server' ]   = getenv('DB_SERVER') ?: 'localhost';
+$_DVWA[ 'db_database' ] = getenv('DB_DATABASE') ?: 'dvwa';
+$_DVWA[ 'db_user' ]     = getenv('DB_USER') ?: 'dvwa';
+$_DVWA[ 'db_password' ] = getenv('DB_PASSWORD') ?: 'dvwapass';
+$_DVWA[ 'db_port']      = getenv('DB_PORT') ?: '3306';
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo vim /etc/apache2/ports.conf
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo head /etc/apache2/ports.conf
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+Listen 127.0.0.1:80
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo chown www-data:www-data config.inc.php
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo chmod 640 config.inc.php
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo systemctl restart apache2
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ ss -tlpn | grep ':80'
+LISTEN 0      511         127.0.0.1:80        0.0.0.0:*
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Go to: http://127.0.0.1/DVWA 
+Login with admin:password
+Click "Create/Reset Database"
+Login again, click "DVWA Security", change to "Low", hit "Submit". 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Enable SSH and Create a Key Pair:
+
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo systemctl start ssh
+
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo systemctl enable ssh
+Synchronizing state of ssh.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable ssh
+Created symlink '/etc/systemd/system/sshd.service' → '/usr/lib/systemd/system/ssh.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/ssh.service' → '/usr/lib/systemd/system/ssh.service'.
+
+┌──(kali㉿host)-[~]
+└─$ ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
+Generating public/private rsa key pair.
+Enter passphrase for "/home/kali/.ssh/id_rsa" (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/kali/.ssh/id_rsa
+Your public key has been saved in /home/kali/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256:<redacted> kali@kali
+The key's randomart image is:
+<Redacted>>
+
+┌──(kali㉿host)-[~]
+└─$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+┌──(kali㉿kali)-[~]
+└─$ sudo vim /etc/ssh/sshd_config
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+PubkeyAuthentication yes
+
+┌──(kali㉿host)-[/var/www/html/DVWA/config]
+└─$ sudo systemctl restart ssh
